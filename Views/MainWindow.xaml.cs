@@ -31,7 +31,6 @@ namespace ImageLabelingAvalonia.Views
                 _bottomPanel.Children.Add(btn);
             }
             _carousel.Items = (DataContext as MainWindowViewModel).Images.Select(x => x.Image);
-            _txtBlockFilename[!TextBlock.TextProperty] = _carousel[!Carousel.SelectedIndexProperty];
             _left.Click += (s, e) =>
             {
                 _carousel.Previous();

@@ -14,7 +14,7 @@
     <StackPanel HorizontalAlignment="Center">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <TextBlock Text="Filename : " HorizontalAlignment="Center"></TextBlock>
-            <TextBlock Name="TxtBlocFilename" HorizontalAlignment="Center"></TextBlock>
+            <TextBlock Name="TxtBlocFilename" Text="{Binding #carousel.SelectedIndex}" HorizontalAlignment="Center"></TextBlock>
         </StackPanel>
         
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 16 0 0" Spacing="8">
