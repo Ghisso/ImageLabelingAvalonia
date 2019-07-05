@@ -119,6 +119,15 @@ namespace ImageLabelingAvalonia.ViewModels
             using(var writer = new StreamWriter(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name, ImageLabeling.csv_name)))
             using(var csv = new CsvWriter(writer))
             {
+                //hacking this to be able to write the header even if no image is tagged
+                List<string> header = new List<string>();
+                header.Add("Filepath");
+                foreach (var clas in ImageLabeling.classes)
+                {
+                    header.Add(clas);
+                }
+                writer.WriteLine(string.Join(",", header));
+
                 foreach (var image in TaggedImages)
                 {
                     var record = new ExpandoObject() as IDictionary<string, Object>;
