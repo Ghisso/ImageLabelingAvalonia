@@ -12,9 +12,14 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>-->
     <StackPanel HorizontalAlignment="Center">
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBlock Text="Filename : " HorizontalAlignment="Center"></TextBlock>
-            <TextBlock Name="TxtBlocFilename" Text="{Binding #carousel.SelectedIndex}" HorizontalAlignment="Center"></TextBlock>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" Margin="0 16 0 0">
+            <TextBlock Text="Filename :" HorizontalAlignment="Center"></TextBlock>
+            <TextBlock Name="TxtBlocFilename" Text="{Binding CurrentFileName}" HorizontalAlignment="Center"></TextBlock>
+            <TextBlock Text="Progress :" HorizontalAlignment="Center"></TextBlock>
+            <TextBlock Text="{Binding CurrentTaggedCount}" HorizontalAlignment="Center"></TextBlock>
+            <TextBlock Text="/" HorizontalAlignment="Center"></TextBlock>
+            <TextBlock Text="{Binding Images.Count}" HorizontalAlignment="Center"></TextBlock>
+            <ProgressBar Minimum="0" Maximum="100" Value="{Binding CurrentProgress}"></ProgressBar>
         </StackPanel>
         
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 16 0 0" Spacing="8">
