@@ -22,12 +22,12 @@
             <ProgressBar VerticalAlignment="Top" Minimum="0" Maximum="100" Value="{Binding CurrentProgress}"></ProgressBar>
         </StackPanel>
 
-        <Button Grid.Row="1" Grid.Column="0" Name="left" VerticalAlignment="Center" Padding="20">
+        <Button Grid.Row="1" Grid.Column="0" Name="left" VerticalAlignment="Center" Padding="20" HotKey="Left" Command="{Binding OnClickPrevious}">
             <Path Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" Fill="Black"/>
         </Button>
         <Carousel Grid.Row="1" Grid.Column="1" Name="carousel" UseLayoutRounding="true">
         </Carousel>
-        <Button Grid.Row="1" Grid.Column="2" Name="right" VerticalAlignment="Center" Padding="20">
+        <Button Grid.Row="1" Grid.Column="2" Name="right" VerticalAlignment="Center" Padding="20"  HotKey="Right" Command="{Binding OnClickNext}">
             <Path Data="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" Fill="Black"/>
         </Button>
         <StackPanel Grid.Row="2" Grid.Column="1" Name="bottomPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 10" Spacing="8">

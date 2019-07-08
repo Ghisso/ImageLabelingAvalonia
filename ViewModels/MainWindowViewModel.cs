@@ -8,6 +8,7 @@ using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using CsvHelper;
 using ImageLabelingAvalonia.Models;
+using ImageLabelingAvalonia.Views;
 using ReactiveUI;
 
 namespace ImageLabelingAvalonia.ViewModels
@@ -15,6 +16,7 @@ namespace ImageLabelingAvalonia.ViewModels
     /// View Model of the Main Window
     public class MainWindowViewModel : ReactiveObject
     {
+        private MainWindow _mainWindow;
         /// This is the list of the image files (with full path)
         public List<string> Files { get; private set; } = new List<string>();
         /// This is the list of the image files with just the filename
@@ -54,8 +56,10 @@ namespace ImageLabelingAvalonia.ViewModels
         
         
         /// Main view model, which takes width and height of screen to set limits to image size
-        public MainWindowViewModel(int width, int height)
+        public MainWindowViewModel(int width, int height, MainWindow window)
         {
+            _mainWindow = window;
+
             foreach (var file in Directory.EnumerateFiles(ImageLabeling.input_path)
                     .Where( x=> extensions.Any(ext => ext == Path.GetExtension(x).ToLower())).OrderBy(x => x))
             {
@@ -160,6 +164,8 @@ namespace ImageLabelingAvalonia.ViewModels
                 CurrentTaggedCount = TaggedImages.Count;
                 CurrentProgress = (int)(((float)TaggedImages.Count/Images.Count)*100);
             }
+
+            _mainWindow.CheckButtonStatus();
             System.Console.WriteLine($"Image at index {CurrentIndex} was labeled {Images[CurrentIndex].Tag}");
         }
 
@@ -228,6 +234,17 @@ namespace ImageLabelingAvalonia.ViewModels
                 // }
                 // csv.WriteRecords(records);
             }
+        }
+
+        // The next 2 are commands for the keyboard shortcuts for left and right arrow
+        public void OnClickPrevious()
+        {
+            _mainWindow.OnPreviousButtonClick(null, null);
+        }
+
+        public void OnClickNext()
+        {
+            _mainWindow.OnNextButtonClick(null, null);
         }
     }
 }

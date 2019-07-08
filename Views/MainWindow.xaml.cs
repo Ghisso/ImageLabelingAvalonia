@@ -10,6 +10,7 @@ using System.Windows.Input;
 using Avalonia.Media;
 using System.Collections.Generic;
 using System.ComponentModel;
+using ReactiveUI;
 
 namespace ImageLabelingAvalonia.Views
 {
@@ -28,16 +29,18 @@ namespace ImageLabelingAvalonia.Views
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainWindowViewModel(Screens.Primary.Bounds.Width, Screens.Primary.Bounds.Height);
+            DataContext = new MainWindowViewModel(Screens.Primary.Bounds.Width, Screens.Primary.Bounds.Height, this);
             _context = (DataContext as MainWindowViewModel);
                 
-            foreach (var clas in ImageLabeling.classes)
+            for (int i = 0; i < ImageLabeling.classes.Length; i++)
             {
                 var btn = new Button() 
                 {
-                    Content = clas,
-                    Background = Brushes.Silver
+                    Content = ImageLabeling.classes[i],
+                    Background = Brushes.Silver,
+                    HotKey = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.D1 + i)
                 };
+                btn.Command = ReactiveCommand.Create(() => _context.LabelImage((string)btn.Content));
                 LabelButtons.Add(btn);
                 btn.Click += OnButtonClick;
                 _bottomPanel.Children.Add(btn);
@@ -46,21 +49,9 @@ namespace ImageLabelingAvalonia.Views
             _carousel.Items = _context.Images.Select(x => x.Image);
             _carousel.SelectedIndex = _context.CurrentIndex;
 
-            _left.Click += (s, e) =>
-            {
-                _carousel.Previous();
-                _context.UpdateIndex(_carousel.SelectedIndex);
-                CheckButtonStatus();
-                CheckPreviousNextButtonsStatus();
-            };
-
-			_right.Click += (s, e) =>
-            {
-                _carousel.Next();
-                _context.UpdateIndex(_carousel.SelectedIndex);
-                CheckButtonStatus();
-                CheckPreviousNextButtonsStatus();
-            };
+            _left.Click += OnPreviousButtonClick;
+            
+			_right.Click += OnNextButtonClick;
 
             Closing += _context.OnWindowClosed;
             CheckPreviousNextButtonsStatus();
@@ -97,17 +88,10 @@ namespace ImageLabelingAvalonia.Views
         private void OnButtonClick(object sender, RoutedEventArgs e)
         {
             _context.LabelImage((string)(sender as Button).Content);
-            foreach (var btn in LabelButtons)
-            {
-                if(_context.Images[_context.CurrentIndex].isTagged && _context.Images[_context.CurrentIndex].Tag == (string)btn.Content)
-                    btn.Background = Brushes.Aqua;
-                else
-                    btn.Background = Brushes.Silver;
-            }
-            
         }
 
-        private void CheckButtonStatus()
+
+        public void CheckButtonStatus()
         {
             foreach (var button in LabelButtons)
             {
@@ -118,6 +102,21 @@ namespace ImageLabelingAvalonia.Views
             }
         }
 
+        public void OnPreviousButtonClick(object sender, RoutedEventArgs e)
+        {
+            _carousel.Previous();
+            _context.UpdateIndex(_carousel.SelectedIndex);
+            CheckButtonStatus();
+            CheckPreviousNextButtonsStatus();
+        }
+
+        public void OnNextButtonClick(object sender, RoutedEventArgs e)
+        {
+            _carousel.Next();
+            _context.UpdateIndex(_carousel.SelectedIndex);
+            CheckButtonStatus();
+            CheckPreviousNextButtonsStatus();
+        }
         
     }
 }
