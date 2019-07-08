@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Dynamic;
 using System.IO;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
-using CsvHelper;
 using ImageLabelingAvalonia.Models;
 using ImageLabelingAvalonia.Views;
 using ReactiveUI;
@@ -186,7 +184,6 @@ namespace ImageLabelingAvalonia.ViewModels
             
             var records = new List<dynamic>();
             using(var writer = new StreamWriter(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name, ImageLabeling.csv_name)))
-            using(var csv = new CsvWriter(writer))
             {
                 //hacking this to be able to write the header even if no image is tagged
                 string[] header = new string[ImageLabeling.classes.Length + 1];
@@ -214,34 +211,16 @@ namespace ImageLabelingAvalonia.ViewModels
                     }
                     writer.WriteLine(string.Join(",", row));
                 }
-
-                // foreach (var image in TaggedImages.OrderBy(x => x.Filename))
-                // {
-                //     var record = new ExpandoObject() as IDictionary<string, Object>;
-                //     record.Add("Filepath", image.Filepath);
-                //     foreach (var clas in ImageLabeling.classes)
-                //     {
-                //         if(clas == image.Tag)
-                //         {
-                //             record.Add(clas, "1");
-                //             File.Copy(image.Filepath, Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name,clas, image.Filename));
-                //         }
-                            
-                //         else
-                //             record.Add(clas, "0");
-                //     }
-                //     records.Add(record);
-                // }
-                // csv.WriteRecords(records);
             }
         }
 
-        // The next 2 are commands for the keyboard shortcuts for left and right arrow
+        /// This is the command for the keyboard shortcuts for left arrow
         public void OnClickPrevious()
         {
             _mainWindow.OnPreviousButtonClick(null, null);
         }
 
+        /// This is the command for the keyboard shortcuts for right arrow
         public void OnClickNext()
         {
             _mainWindow.OnNextButtonClick(null, null);

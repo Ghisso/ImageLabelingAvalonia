@@ -1,10 +1,8 @@
 ﻿using System.IO;
 using Avalonia;
 using Avalonia.Logging.Serilog;
-using ImageLabelingAvalonia.ViewModels;
 using ImageLabelingAvalonia.Views;
 using ImageLabelingAvalonia.Models;
-using CsvHelper;
 
 namespace ImageLabelingAvalonia
 {
@@ -92,7 +90,7 @@ namespace ImageLabelingAvalonia
             // ImageLabeling.labeling_name = "inputfiles-labels";
             // ImageLabeling.classes = new[] {"abc", "def", "ghi", "jkl"};
             // ImageLabeling.isResuming = resume;
-            System.Console.WriteLine("Before BuildAvaloniaApp().Start(AppMain, null);");
+            
             BuildAvaloniaApp().Start(AppMain, null);
         }  
 
@@ -113,7 +111,6 @@ namespace ImageLabelingAvalonia
              WindowState = Avalonia.Controls.WindowState.Maximized,
              SizeToContent = Avalonia.Controls.SizeToContent.WidthAndHeight
             };
-
             app.Run(window);
         }
     }

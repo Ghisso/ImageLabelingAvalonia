@@ -1,15 +1,11 @@
 using System.Linq;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using ImageLabelingAvalonia.ViewModels;
 using ImageLabelingAvalonia.Models;
-using Avalonia.Data;
 using Avalonia.Interactivity;
-using System.Windows.Input;
 using Avalonia.Media;
 using System.Collections.Generic;
-using System.ComponentModel;
 using ReactiveUI;
 
 namespace ImageLabelingAvalonia.Views
@@ -20,7 +16,7 @@ namespace ImageLabelingAvalonia.Views
         private Carousel _carousel;
 		private Button _left;
 		private Button _right;
-        private StackPanel _bottomPanel;
+        private WrapPanel _bottomPanel;
         private TextBlock _txtBlockFilename;
         private MainWindowViewModel _context;
         private List<Button> LabelButtons = new List<Button>();
@@ -29,6 +25,8 @@ namespace ImageLabelingAvalonia.Views
         public MainWindow()
         {
             InitializeComponent();
+            MaxWidth = Screens.Primary.Bounds.Width;
+            MaxHeight = Screens.Primary.Bounds.Height;
             DataContext = new MainWindowViewModel(Screens.Primary.Bounds.Width, Screens.Primary.Bounds.Height, this);
             _context = (DataContext as MainWindowViewModel);
                 
@@ -38,7 +36,10 @@ namespace ImageLabelingAvalonia.Views
                 {
                     Content = ImageLabeling.classes[i],
                     Background = Brushes.Silver,
-                    HotKey = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.D1 + i)
+                    HotKey = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.D1 + i),
+                    Width = 100,
+                    Margin = new Avalonia.Thickness(10),
+                    FontSize = 16
                 };
                 btn.Command = ReactiveCommand.Create(() => _context.LabelImage((string)btn.Content));
                 LabelButtons.Add(btn);
@@ -65,7 +66,7 @@ namespace ImageLabelingAvalonia.Views
             _carousel = this.FindControl<Carousel>("carousel");
 			_left = this.FindControl<Button>("left");
 			_right = this.FindControl<Button>("right");
-            _bottomPanel = this.FindControl<StackPanel>("bottomPanel");
+            _bottomPanel = this.FindControl<WrapPanel>("bottomPanel");
             _txtBlockFilename = this.FindControl<TextBlock>("TxtBlocFilename");
         }
 
@@ -90,7 +91,7 @@ namespace ImageLabelingAvalonia.Views
             _context.LabelImage((string)(sender as Button).Content);
         }
 
-
+        /// This method updates the color of the buttons if they are tagged
         public void CheckButtonStatus()
         {
             foreach (var button in LabelButtons)
@@ -102,6 +103,7 @@ namespace ImageLabelingAvalonia.Views
             }
         }
 
+        /// This method handles clicking on the Previous button
         public void OnPreviousButtonClick(object sender, RoutedEventArgs e)
         {
             _carousel.Previous();
@@ -110,6 +112,7 @@ namespace ImageLabelingAvalonia.Views
             CheckPreviousNextButtonsStatus();
         }
 
+        /// This method handles clicking on the Next button
         public void OnNextButtonClick(object sender, RoutedEventArgs e)
         {
             _carousel.Next();
