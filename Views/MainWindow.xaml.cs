@@ -23,6 +23,7 @@ namespace ImageLabelingAvalonia.Views
         private MainWindowViewModel _context;
         private List<Button> LabelButtons = new List<Button>();
 
+        /// The main window of the app
         public MainWindow()
         {
             InitializeComponent();

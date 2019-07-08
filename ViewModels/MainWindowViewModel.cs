@@ -12,16 +12,23 @@ using ReactiveUI;
 
 namespace ImageLabelingAvalonia.ViewModels
 {
+    /// View Model of the Main Window
     public class MainWindowViewModel : ReactiveObject
     {
+        /// This is the list of the image files (with full path)
         public List<string> Files { get; private set; } = new List<string>();
+        /// This is the list of the image files with just the filename
         public List<string> FileNames { get; private set; } = new List<string>();
+        /// this is the list of the images objects
         public List<ImageLabel> Images { get; private set; } = new List<ImageLabel>();
+        /// this is the list of the tagged images objects
         public List<ImageLabel> TaggedImages { get; private set; } = new List<ImageLabel>();
         private string[] extensions = new string[] { ".jpg", ".jpeg", ".bmp"};
+        /// this is the current index of the carousel
         public int CurrentIndex { get; set; }
 
         private int currentProgress;
+        /// this represents the current progress  of the labeling operation
         public int CurrentProgress
         {
             get { return currentProgress; }
@@ -30,6 +37,7 @@ namespace ImageLabelingAvalonia.ViewModels
         
 
         private string currentFileName;
+        /// this represents the filename of the currently displayed image in the carousel
         public string CurrentFileName
         {
             get { return currentFileName; }
@@ -37,6 +45,7 @@ namespace ImageLabelingAvalonia.ViewModels
         }
 
         private int currentTaggedCount;
+        /// this represents the current number of tagged images
         public int CurrentTaggedCount
         {
             get { return TaggedImages.Count; }
@@ -44,7 +53,7 @@ namespace ImageLabelingAvalonia.ViewModels
         }
         
         
-        
+        /// Main view model, which takes width and height of screen to set limits to image size
         public MainWindowViewModel(int width, int height)
         {
             foreach (var file in Directory.EnumerateFiles(ImageLabeling.input_path)
@@ -87,13 +96,14 @@ namespace ImageLabelingAvalonia.ViewModels
             }
         }
 
+        /// this method updates the index and current file name in the VM
         public void UpdateIndex(int index)
         {
             CurrentIndex = index;
             CurrentFileName = FileNames[CurrentIndex];
         }
 
-
+        /// this method labels or unlables an image
         public void LabelImage(string label)
         {
             if (Images[CurrentIndex].isTagged && Images[CurrentIndex].Tag == label)
@@ -119,10 +129,9 @@ namespace ImageLabelingAvalonia.ViewModels
             System.Console.WriteLine($"Image at index {CurrentIndex} was labeled {Images[CurrentIndex].Tag}");
         }
 
+        /// this method is called when we close the window and it writes the CSV and copies the tagged images in their respective folder
         public void OnWindowClosed(object sender, CancelEventArgs e)
         {
-            System.Console.WriteLine("In closing");
-
 
             if(!ImageLabeling.isResuming)
             {
@@ -139,15 +148,15 @@ namespace ImageLabelingAvalonia.ViewModels
             using(var csv = new CsvWriter(writer))
             {
                 //hacking this to be able to write the header even if no image is tagged
-                List<string> header = new List<string>();
-                header.Add("Filepath");
-                foreach (var clas in ImageLabeling.classes)
+                string[] header = new string[ImageLabeling.classes.Length + 1];
+                header[0] = "Filepath";
+                for (int i = 0; i < ImageLabeling.classes.Length; i++)
                 {
-                    header.Add(clas);
+                    header[i+1] = ImageLabeling.classes[i];
                 }
                 writer.WriteLine(string.Join(",", header));
 
-                foreach (var image in TaggedImages)
+                foreach (var image in TaggedImages.OrderBy(x => x.Filename))
                 {
                     var record = new ExpandoObject() as IDictionary<string, Object>;
                     record.Add("Filepath", image.Filepath);
@@ -166,7 +175,6 @@ namespace ImageLabelingAvalonia.ViewModels
                 }
                 csv.WriteRecords(records);
             }
-            System.Console.WriteLine("End of closing");
         }
     }
 }
