@@ -62,6 +62,17 @@ namespace ImageLabelingAvalonia
             }
             else
             {
+                //System.Console.WriteLine($"output : {output.FullName}");
+                // check if there is already an output csv file
+                if(File.Exists(Path.Combine(output.FullName, name, ImageLabeling.csv_name)))
+                {
+                    System.Console.WriteLine("There seems to be already a CSV file in this folder.");
+                    System.Console.WriteLine("If you are resuming a previous labeling operation, please use the option --resume.");
+                    System.Console.WriteLine("Else, please a different folder for your output.");
+                    return;
+                }
+
+
                 if(classes != null && (classes.Length < 2 || classes.Length > 9))
                 {
                     System.Console.WriteLine("The number of classes must be between 2 and 9.");
@@ -90,7 +101,7 @@ namespace ImageLabelingAvalonia
             // ImageLabeling.labeling_name = "inputfiles-labels";
             // ImageLabeling.classes = new[] {"abc", "def", "ghi", "jkl"};
             // ImageLabeling.isResuming = resume;
-            
+
             BuildAvaloniaApp().Start(AppMain, null);
         }  
 
