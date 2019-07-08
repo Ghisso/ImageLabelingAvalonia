@@ -93,10 +93,14 @@ namespace ImageLabelingAvalonia.Views
         private void OnButtonClick(object sender, RoutedEventArgs e)
         {
             _context.LabelImage((string)(sender as Button).Content);
-            if(_context.Images[_context.CurrentIndex].isTagged && _context.Images[_context.CurrentIndex].Tag == (string)(sender as Button).Content)
-                (sender as Button).Background = Brushes.Aqua;
-            else
-                (sender as Button).Background = Brushes.Silver;
+            foreach (var btn in LabelButtons)
+            {
+                if(_context.Images[_context.CurrentIndex].isTagged && _context.Images[_context.CurrentIndex].Tag == (string)btn.Content)
+                    btn.Background = Brushes.Aqua;
+                else
+                    btn.Background = Brushes.Silver;
+            }
+            
         }
 
         private void CheckButtonStatus()

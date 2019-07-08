@@ -96,13 +96,17 @@ namespace ImageLabelingAvalonia.ViewModels
 
         public void LabelImage(string label)
         {
-            if (Images[CurrentIndex].isTagged)
+            if (Images[CurrentIndex].isTagged && Images[CurrentIndex].Tag == label)
             {
                 Images[CurrentIndex].isTagged = false;
                 Images[CurrentIndex].Tag = string.Empty;
                 TaggedImages.Remove(Images[CurrentIndex]);
                 CurrentTaggedCount = TaggedImages.Count;
                 CurrentProgress = (int)(((float)TaggedImages.Count/Images.Count)*100);
+            }
+            else if (Images[CurrentIndex].isTagged)
+            {
+                Images[CurrentIndex].Tag = label;
             }
             else
             {
