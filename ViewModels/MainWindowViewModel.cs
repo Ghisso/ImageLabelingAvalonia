@@ -68,8 +68,8 @@ namespace ImageLabelingAvalonia.ViewModels
                                               Image = new Image()
                                                 { 
                                                     Source = new Bitmap(file),
-                                                    MaxWidth = width*0.7,
-                                                    MaxHeight = height*0.7,
+                                                    MaxWidth = width*0.9,
+                                                    MaxHeight = height*0.9,
                                                     Stretch = Avalonia.Media.Stretch.Uniform
                                                 }, isTagged = false,
                                                 Tag = String.Empty});
