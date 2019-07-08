@@ -7,6 +7,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using System.Collections.Generic;
 using ReactiveUI;
+using Avalonia.Data;
 
 namespace ImageLabelingAvalonia.Views
 {
@@ -17,6 +18,7 @@ namespace ImageLabelingAvalonia.Views
 		private Button _left;
 		private Button _right;
         private WrapPanel _bottomPanel;
+        private WrapPanel _countPanel;
         private TextBlock _txtBlockFilename;
         private MainWindowViewModel _context;
         private List<Button> LabelButtons = new List<Button>();
@@ -27,6 +29,7 @@ namespace ImageLabelingAvalonia.Views
             InitializeComponent();
             MaxWidth = Screens.Primary.Bounds.Width;
             MaxHeight = Screens.Primary.Bounds.Height;
+            
             DataContext = new MainWindowViewModel(Screens.Primary.Bounds.Width, Screens.Primary.Bounds.Height, this);
             _context = (DataContext as MainWindowViewModel);
                 
@@ -45,7 +48,26 @@ namespace ImageLabelingAvalonia.Views
                 LabelButtons.Add(btn);
                 btn.Click += OnButtonClick;
                 _bottomPanel.Children.Add(btn);
+                
+                System.Console.WriteLine($"For label {ImageLabeling.classes[i]}, count is {_context.TaggedImages.Count(x => x.Tag == ImageLabeling.classes[i]).ToString()}");
+                // var txtBlock = new TextBlock()
+                // {
+                //     [!TextBlock.TextProperty] = new Binding(_context.TaggedImages.Count(x => x.Tag == ImageLabeling.classes[i]).ToString())
+                // };
+                // _countPanel.Children.Add(txtBlock);
             }
+
+            // button to bind the exit command
+            var tmpButton = new Button()
+            {
+                IsEnabled = false,
+                IsVisible = false,
+                HotKey = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.X, Avalonia.Input.InputModifiers.Control),
+                Height = 1,
+                Width = 1
+            };
+            tmpButton.Command = ReactiveCommand.Create(() => { _context.OnWindowClosed(null, null); App.Current.Exit(); });
+            _bottomPanel.Children.Add(tmpButton);
 
             _carousel.Items = _context.Images.Select(x => x.Image);
             _carousel.SelectedIndex = _context.CurrentIndex;
@@ -67,6 +89,7 @@ namespace ImageLabelingAvalonia.Views
 			_left = this.FindControl<Button>("left");
 			_right = this.FindControl<Button>("right");
             _bottomPanel = this.FindControl<WrapPanel>("bottomPanel");
+            _countPanel = this.FindControl<WrapPanel>("countPanel");
             _txtBlockFilename = this.FindControl<TextBlock>("TxtBlocFilename");
         }
 
