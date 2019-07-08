@@ -28,8 +28,7 @@ namespace ImageLabelingAvalonia.Views
             InitializeComponent();
             DataContext = new MainWindowViewModel(Screens.Primary.Bounds.Width, Screens.Primary.Bounds.Height);
             _context = (DataContext as MainWindowViewModel);
-
-
+                
             foreach (var clas in ImageLabeling.classes)
             {
                 var btn = new Button() 

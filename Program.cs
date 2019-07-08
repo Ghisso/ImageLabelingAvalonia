@@ -108,7 +108,13 @@ namespace ImageLabelingAvalonia
         // container, etc.
         private static void AppMain(Application app, string[] args)
         {
-            var window = new MainWindow();
+            var window = new MainWindow()
+            { 
+             WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.Manual,
+             WindowState = Avalonia.Controls.WindowState.Maximized,
+             SizeToContent = Avalonia.Controls.SizeToContent.WidthAndHeight
+            };
+
             app.Run(window);
         }
     }

@@ -48,10 +48,17 @@ namespace ImageLabelingAvalonia.ViewModels
         public MainWindowViewModel(int width, int height)
         {
             foreach (var file in Directory.EnumerateFiles(ImageLabeling.input_path)
-                    .Where( x=> extensions.Any(ext => ext == Path.GetExtension(x))).OrderBy(x => x))
+                    .Where( x=> extensions.Any(ext => ext == Path.GetExtension(x).ToLower())).OrderBy(x => x))
             {
                 Files.Add(file);
                 FileNames.Add(Path.GetFileName(file));
+            }
+
+            if(Files.Count == 0)
+            {
+                System.Console.WriteLine("There are no image files of the proper extensions in the input filder you selected.");
+                System.Console.WriteLine("Please try again with a valid input folder.");
+                App.Current.Exit();
             }
 
             foreach (var file in Files)
@@ -67,9 +74,17 @@ namespace ImageLabelingAvalonia.ViewModels
                                                 }, isTagged = false,
                                                 Tag = String.Empty});
             }
-            CurrentIndex = 0;
-            CurrentProgress = 0;
-            CurrentFileName = FileNames[CurrentIndex];
+
+            if(ImageLabeling.isResuming)
+            {
+
+            }
+            else
+            {
+                CurrentIndex = 0;
+                CurrentProgress = 0;
+                CurrentFileName = FileNames[CurrentIndex];
+            }
         }
 
         public void UpdateIndex(int index)
