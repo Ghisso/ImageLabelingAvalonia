@@ -8,10 +8,13 @@ using ImageLabelingAvalonia.ViewModels;
 
 namespace ImageLabelingAvalonia
 {
+    /// Avalonia stuff
     public class ViewLocator : IDataTemplate
     {
+        /// Avalonia stuff
         public bool SupportsRecycling => false;
 
+        /// Avalonia stuff
         public IControl Build(object data)
         {
             var name = data.GetType().FullName.Replace("ViewModel", "View");
@@ -27,6 +30,7 @@ namespace ImageLabelingAvalonia
             }
         }
 
+        /// Avalonia stuff
         public bool Match(object data)
         {
             return data is ViewModelBase;

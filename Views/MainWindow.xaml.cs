@@ -13,6 +13,7 @@ using System.ComponentModel;
 
 namespace ImageLabelingAvalonia.Views
 {
+    /// This is the main window of the app
     public class MainWindow : Window
     {
         private Carousel _carousel;
@@ -43,6 +44,7 @@ namespace ImageLabelingAvalonia.Views
             }
 
             _carousel.Items = _context.Images.Select(x => x.Image);
+            _carousel.SelectedIndex = _context.CurrentIndex;
 
             _left.Click += (s, e) =>
             {
@@ -62,6 +64,7 @@ namespace ImageLabelingAvalonia.Views
 
             Closing += _context.OnWindowClosed;
             CheckPreviousNextButtonsStatus();
+            CheckButtonStatus();
         }
 
 

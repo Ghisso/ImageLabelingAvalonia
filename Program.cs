@@ -60,7 +60,6 @@ namespace ImageLabelingAvalonia
                 {
                     classes[i-1] = splits[i];
                 }
-                
                 reader.Dispose();
             }
             else

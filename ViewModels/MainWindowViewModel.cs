@@ -61,6 +61,17 @@ namespace ImageLabelingAvalonia.ViewModels
             {
                 Files.Add(file);
                 FileNames.Add(Path.GetFileName(file));
+                Images.Add(new ImageLabel() { Filename = Path.GetFileName(file), 
+                                              Filepath = file,
+                                              Image = new Image()
+                                                { 
+                                                    Source = new Bitmap(file),
+                                                    MaxWidth = width*0.9,
+                                                    MaxHeight = height*0.9,
+                                                    Stretch = Avalonia.Media.Stretch.Uniform
+                                                },
+                                                isTagged = false,
+                                                Tag = String.Empty});
             }
 
             if(Files.Count == 0)
@@ -70,29 +81,52 @@ namespace ImageLabelingAvalonia.ViewModels
                 App.Current.Exit();
             }
 
-            foreach (var file in Files)
-            {
-                Images.Add(new ImageLabel() { Filename = Path.GetFileName(file), 
-                                              Filepath = file,
-                                              Image = new Image()
-                                                { 
-                                                    Source = new Bitmap(file),
-                                                    MaxWidth = width*0.9,
-                                                    MaxHeight = height*0.9,
-                                                    Stretch = Avalonia.Media.Stretch.Uniform
-                                                }, isTagged = false,
-                                                Tag = String.Empty});
-            }
+            // init the currentX properties
+            CurrentIndex = 0;
+            CurrentProgress = 0;
+            CurrentFileName = FileNames[CurrentIndex];
+
 
             if(ImageLabeling.isResuming)
             {
+                string line;
+                // we already checked that the file exists and contains a valid header in Program.cs
+                System.IO.StreamReader file = new System.IO.StreamReader(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name, ImageLabeling.csv_name));  
+                
+                // loop through the lines to read the records if there are
+                while((line = file.ReadLine()) != null)  
+                {
+                    var splits = line.Split(",");
 
-            }
-            else
-            {
-                CurrentIndex = 0;
-                CurrentProgress = 0;
+                    if(splits[0] == "Filepath")
+                        continue;
+
+                    var image = Images.Where( x => x.Filepath == splits[0]).First();
+                    image.isTagged = true;
+                    for (int i = 1; i < splits.Length; i++)
+                    {
+                        if(splits[i] == "1")
+                            image.Tag = ImageLabeling.classes[i-1];
+                    }
+                    TaggedImages.Add(image);
+                }  
+                file.Dispose();
+
+                CurrentTaggedCount = TaggedImages.Count;
+
+                // update the current index to be that of the first untagged image
+                for (int i = 0; i < Files.Count; i++)
+                {
+                    if(!TaggedImages.Select(x => x.Filepath).Contains(Files[i]))
+                        break;
+                    else
+                        CurrentIndex++;
+                }
+                if(CurrentIndex == Files.Count)
+                    CurrentIndex = 0;
+                
                 CurrentFileName = FileNames[CurrentIndex];
+                CurrentProgress = (int)(((float)TaggedImages.Count/Images.Count)*100);
             }
         }
 
@@ -132,17 +166,18 @@ namespace ImageLabelingAvalonia.ViewModels
         /// this method is called when we close the window and it writes the CSV and copies the tagged images in their respective folder
         public void OnWindowClosed(object sender, CancelEventArgs e)
         {
+            if(ImageLabeling.isResuming)
+                // first delete everything in the results folder
+                Directory.Delete(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name), true);
 
-            if(!ImageLabeling.isResuming)
+            // create or recreate the directories
+            Directory.CreateDirectory(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name));
+            foreach (var clas in ImageLabeling.classes)
             {
-                Directory.CreateDirectory(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name));
-                foreach (var clas in ImageLabeling.classes)
-                {
-                    Directory.CreateDirectory(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name,clas));
-                }
+                Directory.CreateDirectory(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name,clas));
             }
             
-
+            
             var records = new List<dynamic>();
             using(var writer = new StreamWriter(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name, ImageLabeling.csv_name)))
             using(var csv = new CsvWriter(writer))
@@ -156,24 +191,42 @@ namespace ImageLabelingAvalonia.ViewModels
                 }
                 writer.WriteLine(string.Join(",", header));
 
-                foreach (var image in TaggedImages.OrderBy(x => x.Filename))
+                string[] row = new string[ImageLabeling.classes.Length + 1];
+                foreach (var image in TaggedImages.OrderBy( x=> x.Filename))
                 {
-                    var record = new ExpandoObject() as IDictionary<string, Object>;
-                    record.Add("Filepath", image.Filepath);
-                    foreach (var clas in ImageLabeling.classes)
+                    row[0] = image.Filepath;
+                    for (int i = 0; i < ImageLabeling.classes.Length; i++)
                     {
-                        if(clas == image.Tag)
+                        if(image.Tag == ImageLabeling.classes[i])
                         {
-                            record.Add(clas, "1");
-                            File.Copy(image.Filepath, Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name,clas, image.Filename));
+                            row[i + 1] = "1";
+                            File.Copy(image.Filepath, Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name,ImageLabeling.classes[i], image.Filename));
                         }
                             
                         else
-                            record.Add(clas, "0");
+                            row[i + 1] = "0";
                     }
-                    records.Add(record);
+                    writer.WriteLine(string.Join(",", row));
                 }
-                csv.WriteRecords(records);
+
+                // foreach (var image in TaggedImages.OrderBy(x => x.Filename))
+                // {
+                //     var record = new ExpandoObject() as IDictionary<string, Object>;
+                //     record.Add("Filepath", image.Filepath);
+                //     foreach (var clas in ImageLabeling.classes)
+                //     {
+                //         if(clas == image.Tag)
+                //         {
+                //             record.Add(clas, "1");
+                //             File.Copy(image.Filepath, Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name,clas, image.Filename));
+                //         }
+                            
+                //         else
+                //             record.Add(clas, "0");
+                //     }
+                //     records.Add(record);
+                // }
+                // csv.WriteRecords(records);
             }
         }
     }

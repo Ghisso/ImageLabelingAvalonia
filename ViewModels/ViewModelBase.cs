@@ -5,6 +5,7 @@ using ReactiveUI;
 
 namespace ImageLabelingAvalonia.ViewModels
 {
+    /// Avalonia stuff
     public class ViewModelBase : ReactiveObject
     {
     }
