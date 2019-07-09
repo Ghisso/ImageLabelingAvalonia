@@ -43,6 +43,7 @@ namespace ImageLabelingAvalonia.Views
             // quick ref to ViewModel
             _context = (DataContext as MainWindowViewModel);
             
+
             // create buttons for each class and corresponding TextBlock for counts
             for (int i = 0; i < ImageLabeling.classes.Length; i++)
             {
@@ -90,6 +91,7 @@ namespace ImageLabelingAvalonia.Views
                 Width = 1
             };
 
+
             // set callback for when using keyboard shortcut
             tmpButton.Command = ReactiveCommand.Create(() => { _context.OnWindowClosed(null, null); App.Current.Exit(); });
             //add to UI, but it's invisible, inactive and super small so OK
@@ -107,6 +109,7 @@ namespace ImageLabelingAvalonia.Views
 
             // set callback for closing the window
             Closing += _context.OnWindowClosed;
+
 
             // update UI
             CheckPreviousNextButtonsStatus();

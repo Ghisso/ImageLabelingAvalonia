@@ -61,7 +61,6 @@ namespace ImageLabelingAvalonia.ViewModels
             // get ref of main window
             _mainWindow = window;
 
-
             // get all the image files and fill the different lists
             foreach (var file in Directory.EnumerateFiles(ImageLabeling.input_path)
                     .Where( x=> extensions.Any(ext => ext == Path.GetExtension(x).ToLower())).OrderBy(x => x))

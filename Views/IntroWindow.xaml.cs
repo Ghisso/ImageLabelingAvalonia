@@ -56,13 +56,12 @@ namespace ImageLabelingAvalonia.Views
                 _startButton.IsEnabled = true;
         }
 
-        public async void OnStartButtonClick(object sender, RoutedEventArgs e)
+        public void OnStartButtonClick(object sender, RoutedEventArgs e)
         {
-            ImageLabeling.input_path = (string)_inputButton.Content;
-            ImageLabeling.output_path = (string)_outputButton.Content;
+            ImageLabeling.input_path = _inputTextBox.Text;
+            ImageLabeling.output_path = _outputTextBox.Text;
             ImageLabeling.labeling_name = _nameTextBox.Text;
             ImageLabeling.isResuming = _doResume.IsChecked == null ? false : (bool)_doResume.IsChecked;
-
             
             var window = new MainWindow()
             { 
@@ -70,9 +69,8 @@ namespace ImageLabelingAvalonia.Views
              WindowState = Avalonia.Controls.WindowState.Maximized,
              SizeToContent = Avalonia.Controls.SizeToContent.WidthAndHeight
             };
-            window.Activate();
-            window.Show();
-            //this.Hide();
+            window.Show(); 
+            this.Close();
         }
     }
 }
