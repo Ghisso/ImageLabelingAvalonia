@@ -120,13 +120,13 @@ namespace ImageLabelingAvalonia
         private static void AppMain(Application app, string[] args)
         {
             // set window size and location in constructor
-            var window = new MainWindow()
+            var window = new IntroWindow()
             { 
              WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.Manual,
              WindowState = Avalonia.Controls.WindowState.Maximized,
              SizeToContent = Avalonia.Controls.SizeToContent.WidthAndHeight
             };
-            
+
             app.Run(window);
         }
     }

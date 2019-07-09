@@ -1,0 +1,33 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="ImageLabelingAvalonia.Views.IntroWindow"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="ImageLabelingAvalonia">
+    <Grid ColumnDefinitions="Auto, Auto, Auto, Auto" RowDefinitions="Auto, Auto, Auto, Auto">
+        
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Input folder" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
+        <TextBox Grid.Row="0" Grid.Column="1" Name="TxtBoxInput" Width="300" Height="30" IsReadOnly="True" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBox>
+        <Button Grid.Row="0" Grid.Column="2" Name="BtnInput" HorizontalAlignment="Left"
+            Width="300" Height="30" Margin="10">Click to choose the input folder</Button>
+    
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Output folder" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
+        <TextBox Grid.Row="1" Grid.Column="1" Name="TxtBoxOutput" Width="300" Height="30" IsReadOnly="True" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBox>
+        <Button Grid.Row="1" Grid.Column="2" Name="BtnOutput" HorizontalAlignment="Left"
+            Width="300" Height="30" Margin="10">Click to choose the output folder</Button>
+    
+    
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Labeling name" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
+        <TextBox Grid.Row="2" Grid.Column="1" Name="TxtBoxName" Text="Results" HorizontalAlignment="Left"
+            Width="300" Height="30" Margin="10"></TextBox>
+    
+    
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Resuming?" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
+        <CheckBox Grid.Row="3" Grid.Column="1" Name="ChkBoxResume" IsChecked="false" HorizontalAlignment="Left"
+            Width="300" Height="30" Margin="10"></CheckBox>
+        <Button Grid.Row="3" Grid.Column="2" Name="BtnStart" IsEnabled="false" HorizontalAlignment="Left" VerticalAlignment="Center"
+            Width="300" Height="30" Margin="10">Start</Button>
+    </Grid>
+</Window>
