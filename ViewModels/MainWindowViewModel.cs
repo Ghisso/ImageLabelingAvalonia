@@ -58,8 +58,11 @@ namespace ImageLabelingAvalonia.ViewModels
         /// Main view model, which takes width and height of screen to set limits to image size
         public MainWindowViewModel(int width, int height, MainWindow window)
         {
+            // get ref of main window
             _mainWindow = window;
 
+
+            // get all the image files and fill the different lists
             foreach (var file in Directory.EnumerateFiles(ImageLabeling.input_path)
                     .Where( x=> extensions.Any(ext => ext == Path.GetExtension(x).ToLower())).OrderBy(x => x))
             {
@@ -78,6 +81,7 @@ namespace ImageLabelingAvalonia.ViewModels
                                                 Tag = String.Empty});
             }
 
+            // sanity check if no images
             if(Files.Count == 0)
             {
                 System.Console.WriteLine("There are no image files of the proper extensions in the input filder you selected.");
@@ -85,7 +89,7 @@ namespace ImageLabelingAvalonia.ViewModels
                 App.Current.Exit();
             }
 
-            // init the currentX properties
+            // init the currentX properties and per tag count
             CurrentIndex = 0;
             CurrentProgress = 0;
             CurrentFileName = FileNames[CurrentIndex];
@@ -95,32 +99,34 @@ namespace ImageLabelingAvalonia.ViewModels
                 PerTagCount[clas] = 0;
             }
 
-
+            // if resuming, read csv, get class names and tagged images
             if(ImageLabeling.isResuming)
             {
                 string line;
                 // we already checked that the file exists and contains a valid header in Program.cs
-                System.IO.StreamReader file = new System.IO.StreamReader(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name, ImageLabeling.csv_name));  
-                
-                // loop through the lines to read the records if there are
-                while((line = file.ReadLine()) != null)  
+                using(System.IO.StreamReader file = new System.IO.StreamReader(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name, ImageLabeling.csv_name))) 
                 {
-                    var splits = line.Split(",");
-
-                    if(splits[0] == "Filepath")
-                        continue;
-
-                    var image = Images.Where( x => x.Filepath == splits[0]).First();
-                    image.isTagged = true;
-                    for (int i = 1; i < splits.Length; i++)
+                    // loop through the lines to read the records if there are
+                    while((line = file.ReadLine()) != null)  
                     {
-                        if(splits[i] == "1")
-                            image.Tag = ImageLabeling.classes[i-1];
-                    }
-                    TaggedImages.Add(image);
-                    PerTagCount[image.Tag]++;
-                }  
-                file.Dispose();
+                        var splits = line.Split(",");
+
+                        // this is header, skip it
+                        if(splits[0] == "Filepath")
+                            continue;
+
+
+                        var image = Images.Where( x => x.Filepath == splits[0]).First();
+                        image.isTagged = true;
+                        for (int i = 1; i < splits.Length; i++)
+                        {
+                            if(splits[i] == "1")
+                                image.Tag = ImageLabeling.classes[i-1];
+                        }
+                        TaggedImages.Add(image);
+                        PerTagCount[image.Tag]++;
+                    }  
+                }
 
                 CurrentTaggedCount = TaggedImages.Count;
 
@@ -132,6 +138,7 @@ namespace ImageLabelingAvalonia.ViewModels
                     else
                         CurrentIndex++;
                 }
+                // if all images are tagged, set index to first image
                 if(CurrentIndex == Files.Count)
                     CurrentIndex = 0;
                 
@@ -140,6 +147,7 @@ namespace ImageLabelingAvalonia.ViewModels
             }
         }
 
+
         /// this method updates the index and current file name in the VM
         public void UpdateIndex(int index)
         {
@@ -147,9 +155,11 @@ namespace ImageLabelingAvalonia.ViewModels
             CurrentFileName = FileNames[CurrentIndex];
         }
 
+
         /// this method labels or unlables an image
         public void LabelImage(string label)
         {
+            // case : removing tag from tagged image
             if (Images[CurrentIndex].isTagged && Images[CurrentIndex].Tag == label)
             {
                 Images[CurrentIndex].isTagged = false;
@@ -159,12 +169,14 @@ namespace ImageLabelingAvalonia.ViewModels
                 CurrentProgress = (int)(((float)TaggedImages.Count/Images.Count)*100);
                 PerTagCount[label]--;
             }
+            // case : change tag of tagged image
             else if (Images[CurrentIndex].isTagged)
             {
                 PerTagCount[Images[CurrentIndex].Tag]--;
                 Images[CurrentIndex].Tag = label;
                 PerTagCount[label]++;
             }
+            // case : tag untagged image
             else
             {
                 Images[CurrentIndex].isTagged = true;
@@ -179,6 +191,7 @@ namespace ImageLabelingAvalonia.ViewModels
             _mainWindow.CheckButtonStatus();
             _mainWindow.updateCountText();
         }
+
 
         /// this method is called when we close the window and it writes the CSV and copies the tagged images in their respective folder
         public void OnWindowClosed(object sender, CancelEventArgs e)
@@ -195,7 +208,7 @@ namespace ImageLabelingAvalonia.ViewModels
             }
             
             
-            var records = new List<dynamic>();
+            // write to CSV and copy images
             using(var writer = new StreamWriter(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name, ImageLabeling.csv_name)))
             {
                 //hacking this to be able to write the header even if no image is tagged
@@ -207,6 +220,7 @@ namespace ImageLabelingAvalonia.ViewModels
                 }
                 writer.WriteLine(string.Join(",", header));
 
+                // create row for each tagged image and write it to CSV and copy image to correct folder
                 string[] row = new string[ImageLabeling.classes.Length + 1];
                 foreach (var image in TaggedImages.OrderBy( x=> x.Filename))
                 {
@@ -227,11 +241,13 @@ namespace ImageLabelingAvalonia.ViewModels
             }
         }
 
+
         /// This is the command for the keyboard shortcuts for left arrow
         public void OnClickPrevious()
         {
             _mainWindow.OnPreviousButtonClick(null, null);
         }
+
 
         /// This is the command for the keyboard shortcuts for right arrow
         public void OnClickNext()

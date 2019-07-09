@@ -33,10 +33,10 @@ namespace ImageLabelingAvalonia
             if(name == null)
                 name = input.Name + "-labels";
                 
-
-
+            // classes depend on whether we are resuming or not
             if(resume)
             {
+                // if resuming, the CSV must exist
                 if(!File.Exists(Path.Combine(output.FullName, name, ImageLabeling.csv_name)))
                 {
                     System.Console.WriteLine("The 'results.csv' file could not be found in the specified path.");
@@ -44,26 +44,29 @@ namespace ImageLabelingAvalonia
                     return;
                 }
 
-                var reader = new StreamReader(Path.Combine(output.FullName, name, ImageLabeling.csv_name));
-                
-                string line = reader.ReadLine();
-                if(line == null)
+                // get classes from the CSV
+                using(var reader = new StreamReader(Path.Combine(output.FullName, name, ImageLabeling.csv_name)))
                 {
-                    System.Console.WriteLine("The csv file seems to be corrupted. Aborting...");
-                    return;
+                    string line = reader.ReadLine();
+
+                    if(line == null)
+                    {
+                        System.Console.WriteLine("The csv file seems to be corrupted. Aborting...");
+                        return;
+                    }
+
+                    var splits = line.Split(",");
+
+                    classes = new string[splits.Length - 1];
+                    for (int i = 1; i < splits.Length; i++)
+                    {
+                        classes[i-1] = splits[i];
+                    }
                 }
-                var splits = line.Split(",");
-                classes = new string[splits.Length - 1];
-                for (int i = 1; i < splits.Length; i++)
-                {
-                    classes[i-1] = splits[i];
-                }
-                reader.Dispose();
             }
             else
             {
-                //System.Console.WriteLine($"output : {output.FullName}");
-                // check if there is already an output csv file
+                // check if there is already an output csv file, there musn't
                 if(File.Exists(Path.Combine(output.FullName, name, ImageLabeling.csv_name)))
                 {
                     System.Console.WriteLine("There seems to be already a CSV file in this folder.");
@@ -71,7 +74,6 @@ namespace ImageLabelingAvalonia
                     System.Console.WriteLine("Else, please a different folder for your output.");
                     return;
                 }
-
 
                 if(classes != null && (classes.Length < 2 || classes.Length > 9))
                 {
@@ -83,6 +85,7 @@ namespace ImageLabelingAvalonia
 
             }
 
+            // update the global parameters
             ImageLabeling.input_path = input.FullName;
             ImageLabeling.output_path = output.FullName;
             ImageLabeling.labeling_name = name;
@@ -116,12 +119,14 @@ namespace ImageLabelingAvalonia
         // container, etc.
         private static void AppMain(Application app, string[] args)
         {
+            // set window size and location in constructor
             var window = new MainWindow()
             { 
              WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.Manual,
              WindowState = Avalonia.Controls.WindowState.Maximized,
              SizeToContent = Avalonia.Controls.SizeToContent.WidthAndHeight
             };
+            
             app.Run(window);
         }
     }
