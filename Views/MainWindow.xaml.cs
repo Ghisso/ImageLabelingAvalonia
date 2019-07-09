@@ -22,6 +22,7 @@ namespace ImageLabelingAvalonia.Views
         private TextBlock _txtBlockFilename;
         private MainWindowViewModel _context;
         private List<Button> LabelButtons = new List<Button>();
+        private List<TextBlock> CountTextBlocks = new List<TextBlock>();
 
         /// The main window of the app
         public MainWindow()
@@ -50,11 +51,15 @@ namespace ImageLabelingAvalonia.Views
                 _bottomPanel.Children.Add(btn);
                 
                 System.Console.WriteLine($"For label {ImageLabeling.classes[i]}, count is {_context.TaggedImages.Count(x => x.Tag == ImageLabeling.classes[i]).ToString()}");
-                // var txtBlock = new TextBlock()
-                // {
-                //     [!TextBlock.TextProperty] = new Binding(_context.TaggedImages.Count(x => x.Tag == ImageLabeling.classes[i]).ToString())
-                // };
-                // _countPanel.Children.Add(txtBlock);
+                var txtBlock = new TextBlock()
+                {
+                    Width = 100,
+                    Margin = new Avalonia.Thickness(10),
+                    FontSize = 16,
+                    TextAlignment = Avalonia.Media.TextAlignment.Center
+                };
+                CountTextBlocks.Add(txtBlock);
+                _countPanel.Children.Add(txtBlock);
             }
 
             // button to bind the exit command
@@ -79,6 +84,7 @@ namespace ImageLabelingAvalonia.Views
             Closing += _context.OnWindowClosed;
             CheckPreviousNextButtonsStatus();
             CheckButtonStatus();
+            updateCountText();
         }
 
 
@@ -133,6 +139,7 @@ namespace ImageLabelingAvalonia.Views
             _context.UpdateIndex(_carousel.SelectedIndex);
             CheckButtonStatus();
             CheckPreviousNextButtonsStatus();
+            updateCountText();
         }
 
         /// This method handles clicking on the Next button
@@ -142,7 +149,16 @@ namespace ImageLabelingAvalonia.Views
             _context.UpdateIndex(_carousel.SelectedIndex);
             CheckButtonStatus();
             CheckPreviousNextButtonsStatus();
+            updateCountText();
         }
         
+        /// This method updates the count of each class (couldn't do it by binding...)
+        public void updateCountText()
+        {
+            for (int i = 0; i < CountTextBlocks.Count; i++)
+            {
+                CountTextBlocks[i].Text = _context.PerTagCount[ImageLabeling.classes[i]].ToString();
+            }
+        }
     }
 }

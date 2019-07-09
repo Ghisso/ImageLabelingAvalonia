@@ -51,6 +51,8 @@ namespace ImageLabelingAvalonia.ViewModels
             get { return TaggedImages.Count; }
             set { this.RaiseAndSetIfChanged(ref currentTaggedCount, value); }
         }
+        /// this represents the number of tagged images for each tag
+        public Dictionary<string, int> PerTagCount { get; set; } = new Dictionary<string, int>();
         
         
         /// Main view model, which takes width and height of screen to set limits to image size
@@ -88,6 +90,11 @@ namespace ImageLabelingAvalonia.ViewModels
             CurrentProgress = 0;
             CurrentFileName = FileNames[CurrentIndex];
 
+            foreach (var clas in ImageLabeling.classes)
+            {
+                PerTagCount[clas] = 0;
+            }
+
 
             if(ImageLabeling.isResuming)
             {
@@ -111,6 +118,7 @@ namespace ImageLabelingAvalonia.ViewModels
                             image.Tag = ImageLabeling.classes[i-1];
                     }
                     TaggedImages.Add(image);
+                    PerTagCount[image.Tag]++;
                 }  
                 file.Dispose();
 
@@ -149,10 +157,13 @@ namespace ImageLabelingAvalonia.ViewModels
                 TaggedImages.Remove(Images[CurrentIndex]);
                 CurrentTaggedCount = TaggedImages.Count;
                 CurrentProgress = (int)(((float)TaggedImages.Count/Images.Count)*100);
+                PerTagCount[label]--;
             }
             else if (Images[CurrentIndex].isTagged)
             {
+                PerTagCount[Images[CurrentIndex].Tag]--;
                 Images[CurrentIndex].Tag = label;
+                PerTagCount[label]++;
             }
             else
             {
@@ -161,10 +172,12 @@ namespace ImageLabelingAvalonia.ViewModels
                 TaggedImages.Add(Images[CurrentIndex]);
                 CurrentTaggedCount = TaggedImages.Count;
                 CurrentProgress = (int)(((float)TaggedImages.Count/Images.Count)*100);
+                PerTagCount[label]++;
             }
 
+            // wanted to call these from mainWindow but doesn't update immediately there don't know why....
             _mainWindow.CheckButtonStatus();
-            System.Console.WriteLine($"Image at index {CurrentIndex} was labeled {Images[CurrentIndex].Tag}");
+            _mainWindow.updateCountText();
         }
 
         /// this method is called when we close the window and it writes the CSV and copies the tagged images in their respective folder

@@ -9,7 +9,7 @@
         Title="ImageLabelingAvalonia">
     
     
-    <Grid ColumnDefinitions="Auto, *, Auto" RowDefinitions="Auto, *, Auto">
+    <Grid ColumnDefinitions="Auto, *, Auto, Auto" RowDefinitions="Auto, *, Auto, Auto">
         <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="5" Margin="0 10 0 10">
             <TextBlock Text="Filename :" HorizontalAlignment="Center"></TextBlock>
             <TextBlock Name="TxtBlocFilename" Text="{Binding CurrentFileName}" HorizontalAlignment="Center"></TextBlock>
@@ -28,9 +28,11 @@
         <Button Grid.Row="1" Grid.Column="2" Name="right" VerticalAlignment="Center" Padding="20"  HotKey="Right" Command="{Binding OnClickNext}">
             <Path Data="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" Fill="Black"/>
         </Button>
-        <WrapPanel Grid.Row="2" Grid.Column="1" Name="bottomPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 10">
+        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="Classes :"></TextBlock>
+        <WrapPanel Grid.Row="2" Grid.Column="1" Name="bottomPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 0">
         </WrapPanel>
-        <WrapPanel Grid.Row="3" Grid.Column="1" Name="countPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 10">
+        <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="Count :"></TextBlock>
+        <WrapPanel Grid.Row="3" Grid.Column="1" Name="countPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 0">
         </WrapPanel>
     </Grid>
 
