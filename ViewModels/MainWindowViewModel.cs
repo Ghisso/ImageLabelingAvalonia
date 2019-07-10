@@ -94,7 +94,7 @@ namespace ImageLabelingAvalonia.ViewModels
             if(ImageLabeling.isResuming)
             {
                 string line;
-                // we already checked that the file exists and contains a valid header in Program.cs
+                // we already checked that the file exists and contains a valid header in startButton handler
                 using(System.IO.StreamReader file = new System.IO.StreamReader(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name, ImageLabeling.csv_name))) 
                 {
                     // loop through the lines to read the records if there are

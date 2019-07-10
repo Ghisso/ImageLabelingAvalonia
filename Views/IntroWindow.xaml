@@ -23,7 +23,7 @@
     
         <TextBlock Grid.Row="2" Grid.Column="0" Text="Labeling name" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
         <TextBox Grid.Row="2" Grid.Column="1" Name="TxtBoxName" Text="Results" HorizontalAlignment="Left"
-            Width="250" Height="30" Margin="10"></TextBox>
+            Width="250" Height="30" Margin="10" BorderBrush="Blue"></TextBox>
     
     
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Resuming?" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
@@ -76,7 +76,7 @@
             Text="" Width="250" Height="30" Margin="10" BorderBrush="Blue"></TextBox>
 
         <TextBlock Grid.Row="13" Grid.Column="1" Name="TxtBlockError" TextWrapping="Wrap" Foreground="Red" HorizontalAlignment="Left"
-            Width="250" Height="30" Margin="10"></TextBlock>
+            Width="250" Height="40" Margin="10"></TextBlock>
         <Button Grid.Row="14" Grid.Column="1" Name="BtnStart" IsEnabled="false" HorizontalAlignment="Left" VerticalAlignment="Center"
             Width="250" Height="30" Margin="10">Start</Button>
     </Grid>

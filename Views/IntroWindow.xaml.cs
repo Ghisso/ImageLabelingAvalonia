@@ -18,6 +18,9 @@ namespace ImageLabelingAvalonia.Views
         private TextBlock _errorTextBlock;
         private CheckBox _doResume;
         private List<TextBox> classesTextBoxes = new List<TextBox>();
+
+        private Brush activeBorder = new SolidColorBrush(Colors.Blue);
+        private Brush inactiveBorder = new SolidColorBrush(new Color(255,136,136,136));
         
          public IntroWindow()
         {
@@ -38,6 +41,7 @@ namespace ImageLabelingAvalonia.Views
             classesTextBoxes.Add(_class7);
             classesTextBoxes.Add(_class8);
             classesTextBoxes.Add(_class9);
+            _doResume.Click += OnCheckBoxClick;
         }
 
         private void InitializeComponent()
@@ -89,25 +93,7 @@ namespace ImageLabelingAvalonia.Views
         {
             ImageLabeling.input_path = _inputTextBox.Text;
             ImageLabeling.output_path = _outputTextBox.Text;
-            ImageLabeling.labeling_name = _nameTextBox.Text;
             ImageLabeling.isResuming = _doResume.IsChecked == null ? false : (bool)_doResume.IsChecked;
-
-            // check classes
-            var classes = classesTextBoxes.Where(x => x.Text.Length > 0).Select(x => x.Text).ToArray();
-            if(classes.Length < 2)
-            {
-                _errorTextBlock.Text = "The number of labels must be between 2 and 9.";
-                return;
-            }
-
-            // check that classes are unique
-            if(classes.Distinct().Count() != classes.Length)
-            {
-                _errorTextBlock.Text = "All labels must be unique.";
-                return;
-            }
-            
-            ImageLabeling.classes = classes;
 
 
             // check there are images in the input folder
@@ -118,11 +104,63 @@ namespace ImageLabelingAvalonia.Views
             }
 
 
-            if(ImageLabeling.isResuming && !CheckCSVExistsIfResuming())
+            // check labeling name
+            if(_nameTextBox.Text.Length < 1)
             {
-                _errorTextBlock.Text ="You are trying to resume but there was CSV found in the folders and names specified.";
+                _errorTextBlock.Text = "You must choose a name for the result folder.";
                 return;
             }
+            ImageLabeling.labeling_name = _nameTextBox.Text;
+
+
+            // check classes
+            string[] classes;
+            if(!(bool)_doResume.IsChecked)
+            {
+                classes = classesTextBoxes.Where(x => x.Text.Length > 0).Select(x => x.Text).ToArray();
+                if(classes.Length < 2)
+                {
+                    _errorTextBlock.Text = "The number of labels must be between 2 and 9.";
+                    return;
+                }
+                // check that classes are unique
+                if(classes.Distinct().Count() != classes.Length)
+                {
+                    _errorTextBlock.Text = "All labels must be unique.";
+                    return;
+                }
+                ImageLabeling.classes = classes;
+            }
+            else
+            {
+                // check if resuming but no csv
+                if(!CheckCSVExistsIfResuming())
+                {
+                    _errorTextBlock.Text = "You are trying to resume but there was no CSV found in the folders and names specified.";
+                    return;
+                }
+
+                using(var reader = new StreamReader(Path.Combine(_outputTextBox.Text, _nameTextBox.Text, ImageLabeling.csv_name)))
+                {
+                    string header = reader.ReadLine();
+
+                    if(header == null)
+                    {
+                        _errorTextBlock.Text = "The CSV file seems to be corrupted.";
+                        return;
+                    }
+
+                    var splits = header.Split(",");
+
+                    classes = new string[splits.Length - 1];
+                    for (int i = 1; i < splits.Length; i++)
+                    {
+                        classes[i-1] = splits[i];
+                    }
+                }
+                ImageLabeling.classes = classes;
+            }
+            
             
             // check if you are not resuming but output+name folder already has a csv
             if(!ImageLabeling.isResuming && File.Exists(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name, ImageLabeling.csv_name)))
@@ -131,11 +169,11 @@ namespace ImageLabelingAvalonia.Views
                 return;
             }
 
-            System.Console.WriteLine($"{ImageLabeling.input_path}");
-            System.Console.WriteLine($"{ImageLabeling.output_path}");
-            System.Console.WriteLine($"{ImageLabeling.labeling_name}");
-            System.Console.WriteLine($"{ImageLabeling.classes[0]}");
-            System.Console.WriteLine($"{ImageLabeling.isResuming}");
+            // System.Console.WriteLine($"{ImageLabeling.input_path}");
+            // System.Console.WriteLine($"{ImageLabeling.output_path}");
+            // System.Console.WriteLine($"{ImageLabeling.labeling_name}");
+            // System.Console.WriteLine($"{ImageLabeling.classes[0]}");
+            // System.Console.WriteLine($"{ImageLabeling.isResuming}");
             
             var window = new MainWindow()
             { 
@@ -154,9 +192,29 @@ namespace ImageLabelingAvalonia.Views
             .Count(x => ImageLabeling.extensions.Any(ext => ext == Path.GetExtension(x).ToLower())) > 0;
         }
 
+
         private bool CheckCSVExistsIfResuming()
         {
             return File.Exists(Path.Combine(_outputTextBox.Text, _nameTextBox.Text, ImageLabeling.csv_name));
+        }
+
+
+        private void OnCheckBoxClick(object sender, RoutedEventArgs e)
+        {
+            CheckBox check = sender as CheckBox;
+            foreach (var box in classesTextBoxes)
+            {
+                if((bool)check.IsChecked)
+                {
+                    box.IsEnabled = false;
+                    box.BorderBrush = inactiveBorder;
+                }
+                else
+                {
+                    box.IsEnabled = true;
+                    box.BorderBrush = activeBorder;
+                }
+            }
         }
     }
 }
