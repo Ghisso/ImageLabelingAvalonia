@@ -8,6 +8,8 @@ using Avalonia.Media.Imaging;
 using ImageLabelingAvalonia.Models;
 using ImageLabelingAvalonia.Views;
 using ReactiveUI;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ImageLabelingAvalonia.ViewModels
 {
@@ -15,14 +17,22 @@ namespace ImageLabelingAvalonia.ViewModels
     public class MainWindowViewModel : ReactiveObject
     {
         private MainWindow _mainWindow;
+        private object lockObject = new object();
+        private CancellationTokenSource tokenSource = new CancellationTokenSource();
+        private CancellationToken token;
+
         /// This is the list of the image files (with full path)
         public List<string> Files { get; private set; } = new List<string>();
+
         /// This is the list of the image files with just the filename
         public List<string> FileNames { get; private set; } = new List<string>();
+
         /// this is the list of the images objects
         public List<ImageLabel> Images { get; private set; } = new List<ImageLabel>();
+
         /// this is the list of the tagged images objects
         public List<ImageLabel> TaggedImages { get; private set; } = new List<ImageLabel>();
+
         /// this is the current index of the carousel
         public int CurrentIndex { get; set; }
 
@@ -59,6 +69,9 @@ namespace ImageLabelingAvalonia.ViewModels
         {
             // get ref of main window
             _mainWindow = window;
+
+            // get cancellation token
+            token = tokenSource.Token;
 
             // get all the image files and fill the different lists
             foreach (var file in Directory.EnumerateFiles(ImageLabeling.input_path)
@@ -135,7 +148,29 @@ namespace ImageLabelingAvalonia.ViewModels
                 
                 CurrentFileName = FileNames[CurrentIndex];
                 CurrentProgress = (int)(((float)TaggedImages.Count/Images.Count)*100);
+
+
+                // delete all the copied images
+                foreach (var directory in Directory.EnumerateDirectories(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name)))
+                {
+                    foreach (var file in Directory.EnumerateFiles(directory))
+                    {
+                        File.Delete(file);
+                    }
+                }
             }
+            // create the folders
+            else
+            {
+                Directory.CreateDirectory(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name));
+                foreach (var clas in ImageLabeling.classes)
+                {
+                    Directory.CreateDirectory(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name,clas));
+                }
+            }
+
+            // start new thread for automatic CSV writing every minute
+            Task.Run(() => WriteCSV(), token);
         }
 
 
@@ -187,49 +222,47 @@ namespace ImageLabelingAvalonia.ViewModels
         /// this method is called when we close the window and it writes the CSV and copies the tagged images in their respective folder
         public void OnWindowClosed(object sender, CancelEventArgs e)
         {
-            if(ImageLabeling.isResuming)
-                // first delete everything in the results folder
-                Directory.Delete(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name), true);
+            // cancel the automatic CSV writing in the other thread
+            tokenSource.Cancel();
 
-            // create or recreate the directories
-            Directory.CreateDirectory(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name));
-            foreach (var clas in ImageLabeling.classes)
-            {
-                Directory.CreateDirectory(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name,clas));
-            }
             
             
-            // write to CSV and copy images
-            using(var writer = new StreamWriter(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name, ImageLabeling.csv_name)))
+            lock(lockObject)
             {
-                //hacking this to be able to write the header even if no image is tagged
-                string[] header = new string[ImageLabeling.classes.Length + 1];
-                header[0] = "Filepath";
-                for (int i = 0; i < ImageLabeling.classes.Length; i++)
+                // write to CSV and copy images
+                using(var writer = new StreamWriter(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name, ImageLabeling.csv_name)))
                 {
-                    header[i+1] = ImageLabeling.classes[i];
-                }
-                writer.WriteLine(string.Join(",", header));
-
-                // create row for each tagged image and write it to CSV and copy image to correct folder
-                string[] row = new string[ImageLabeling.classes.Length + 1];
-                foreach (var image in TaggedImages.OrderBy( x=> x.Filename))
-                {
-                    row[0] = image.Filepath;
+                    //hacking this to be able to write the header even if no image is tagged
+                    string[] header = new string[ImageLabeling.classes.Length + 1];
+                    header[0] = "Filepath";
                     for (int i = 0; i < ImageLabeling.classes.Length; i++)
                     {
-                        if(image.Tag == ImageLabeling.classes[i])
-                        {
-                            row[i + 1] = "1";
-                            File.Copy(image.Filepath, Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name,ImageLabeling.classes[i], image.Filename));
-                        }
-                            
-                        else
-                            row[i + 1] = "0";
+                        header[i+1] = ImageLabeling.classes[i];
                     }
-                    writer.WriteLine(string.Join(",", row));
+                    writer.WriteLine(string.Join(",", header));
+
+                    // create row for each tagged image and write it to CSV and copy image to correct folder
+                    string[] row = new string[ImageLabeling.classes.Length + 1];
+                    foreach (var image in TaggedImages.OrderBy( x=> x.Filename))
+                    {
+                        row[0] = image.Filepath;
+                        for (int i = 0; i < ImageLabeling.classes.Length; i++)
+                        {
+                            if(image.Tag == ImageLabeling.classes[i])
+                            {
+                                row[i + 1] = "1";
+                                File.Copy(image.Filepath, Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name,ImageLabeling.classes[i], image.Filename));
+                            }
+                                
+                            else
+                                row[i + 1] = "0";
+                        }
+                        writer.WriteLine(string.Join(",", row));
+                    }
                 }
             }
+
+            tokenSource.Dispose();
         }
 
 
@@ -244,6 +277,50 @@ namespace ImageLabelingAvalonia.ViewModels
         public void OnClickNext()
         {
             _mainWindow.OnNextButtonClick(null, null);
+        }
+
+        /// This method is used to periodically write the CSV in another thread
+        private void WriteCSV()
+        {
+            while(true)
+            {
+                // sleep for 1 minute
+                Thread.Sleep(new TimeSpan(0,1,0));
+
+                token.ThrowIfCancellationRequested();
+
+                lock(lockObject)
+                {
+                    using(var writer = new StreamWriter(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name, ImageLabeling.csv_name)))
+                    {
+                        //hacking this to be able to write the header even if no image is tagged
+                        string[] header = new string[ImageLabeling.classes.Length + 1];
+                        header[0] = "Filepath";
+                        for (int i = 0; i < ImageLabeling.classes.Length; i++)
+                        {
+                            header[i+1] = ImageLabeling.classes[i];
+                        }
+                        writer.WriteLine(string.Join(",", header));
+
+                        // create row for each tagged image and write it to CSV
+                        string[] row = new string[ImageLabeling.classes.Length + 1];
+                        foreach (var image in TaggedImages.OrderBy( x=> x.Filename))
+                        {
+                            row[0] = image.Filepath;
+                            for (int i = 0; i < ImageLabeling.classes.Length; i++)
+                            {
+                                if(image.Tag == ImageLabeling.classes[i])
+                                {
+                                    row[i + 1] = "1";
+                                }
+                                else
+                                    row[i + 1] = "0";
+                            }
+                            writer.WriteLine(string.Join(",", row));
+                        }
+                    }
+                }
+            }
         }
     }
 }
