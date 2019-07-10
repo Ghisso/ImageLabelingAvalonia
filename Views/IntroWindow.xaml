@@ -6,30 +6,78 @@
         x:Class="ImageLabelingAvalonia.Views.IntroWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="ImageLabelingAvalonia">
-    <Grid ColumnDefinitions="Auto, Auto, Auto, Auto" RowDefinitions="Auto, Auto, Auto, Auto">
+    <Grid ColumnDefinitions="Auto, Auto, Auto" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto">
         
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Input folder" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
-        <TextBox Grid.Row="0" Grid.Column="1" Name="TxtBoxInput" Width="300" Height="30" IsReadOnly="True" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBox>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Input folder" HorizontalAlignment="Left" VerticalAlignment="Center"
+            TextWrapping="Wrap" Margin="10"></TextBlock>
+        <TextBox Grid.Row="0" Grid.Column="1" Name="TxtBoxInput" Width="250" Height="30" IsReadOnly="True" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBox>
         <Button Grid.Row="0" Grid.Column="2" Name="BtnInput" HorizontalAlignment="Left"
-            Width="300" Height="30" Margin="10">Click to choose the input folder</Button>
+            Width="250" Height="30" Margin="10">Click to choose the input folder</Button>
     
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Output folder" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
-        <TextBox Grid.Row="1" Grid.Column="1" Name="TxtBoxOutput" Width="300" Height="30" IsReadOnly="True" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBox>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Output folder" HorizontalAlignment="Left" VerticalAlignment="Center"
+         TextWrapping="Wrap" Margin="10"></TextBlock>
+        <TextBox Grid.Row="1" Grid.Column="1" Name="TxtBoxOutput" Width="250" Height="30" IsReadOnly="True" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBox>
         <Button Grid.Row="1" Grid.Column="2" Name="BtnOutput" HorizontalAlignment="Left"
-            Width="300" Height="30" Margin="10">Click to choose the output folder</Button>
+            Width="250" Height="30" Margin="10">Click to choose the output folder</Button>
     
     
         <TextBlock Grid.Row="2" Grid.Column="0" Text="Labeling name" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
         <TextBox Grid.Row="2" Grid.Column="1" Name="TxtBoxName" Text="Results" HorizontalAlignment="Left"
-            Width="300" Height="30" Margin="10"></TextBox>
-            <TextBlock Grid.Row="2" Grid.Column="2" Name="TxtBlockError" TextWrapping="Wrap" Foreground="Red" HorizontalAlignment="Left"
-            Width="300" Height="30" Margin="10"></TextBlock>
+            Width="250" Height="30" Margin="10"></TextBox>
     
     
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Resuming?" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
-        <CheckBox Grid.Row="3" Grid.Column="1" Name="ChkBoxResume" IsChecked="false" HorizontalAlignment="Left"
-            Width="300" Height="30" Margin="10"></CheckBox>
-        <Button Grid.Row="3" Grid.Column="2" Name="BtnStart" IsEnabled="false" HorizontalAlignment="Left" VerticalAlignment="Center"
-            Width="300" Height="30" Margin="10">Start</Button>
+        <CheckBox Grid.Row="3" Grid.Column="1" Name="ChkBoxResume" IsChecked="false" HorizontalAlignment="Center"
+            Width="250" Height="30" Margin="10"></CheckBox>
+
+
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="Label 1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
+        <TextBox Grid.Row="4" Grid.Column="1" Name="TxtBoxClass1" HorizontalAlignment="Left"
+            Text="" Width="250" Height="30" Margin="10" BorderBrush="Blue"></TextBox>
+
+
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="Label 2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
+        <TextBox Grid.Row="5" Grid.Column="1" Name="TxtBoxClass2" HorizontalAlignment="Left"
+            Text="" Width="250" Height="30" Margin="10" BorderBrush="Blue"></TextBox>
+
+
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="Label 3" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
+        <TextBox Grid.Row="6" Grid.Column="1" Name="TxtBoxClass3" HorizontalAlignment="Left"
+            Text="" Width="250" Height="30" Margin="10" BorderBrush="Blue"></TextBox>
+
+
+        <TextBlock Grid.Row="7" Grid.Column="0" Text="Label 4" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
+        <TextBox Grid.Row="7" Grid.Column="1" Name="TxtBoxClass4" HorizontalAlignment="Left"
+            Text="" Width="250" Height="30" Margin="10" BorderBrush="Blue"></TextBox>
+
+
+        <TextBlock Grid.Row="8" Grid.Column="0" Text="Label 5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
+        <TextBox Grid.Row="8" Grid.Column="1" Name="TxtBoxClass5" HorizontalAlignment="Left"
+            Text="" Width="250" Height="30" Margin="10" BorderBrush="Blue"></TextBox>
+
+
+        <TextBlock Grid.Row="9" Grid.Column="0" Text="Label 6" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
+        <TextBox Grid.Row="9" Grid.Column="1" Name="TxtBoxClass6" HorizontalAlignment="Left"
+            Text="" Width="250" Height="30" Margin="10" BorderBrush="Blue"></TextBox>
+
+
+        <TextBlock Grid.Row="10" Grid.Column="0" Text="Label 7" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
+        <TextBox Grid.Row="10" Grid.Column="1" Name="TxtBoxClass7" HorizontalAlignment="Left"
+            Text="" Width="250" Height="30" Margin="10" BorderBrush="Blue"></TextBox>
+
+
+        <TextBlock Grid.Row="11" Grid.Column="0" Text="Label 8" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
+        <TextBox Grid.Row="11" Grid.Column="1" Name="TxtBoxClass8" HorizontalAlignment="Left"
+            Text="" Width="250" Height="30" Margin="10" BorderBrush="Blue"></TextBox>
+
+
+        <TextBlock Grid.Row="12" Grid.Column="0" Text="Label 9" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></TextBlock>
+        <TextBox Grid.Row="12" Grid.Column="1" Name="TxtBoxClass9" HorizontalAlignment="Left"
+            Text="" Width="250" Height="30" Margin="10" BorderBrush="Blue"></TextBox>
+
+        <TextBlock Grid.Row="13" Grid.Column="1" Name="TxtBlockError" TextWrapping="Wrap" Foreground="Red" HorizontalAlignment="Left"
+            Width="250" Height="30" Margin="10"></TextBlock>
+        <Button Grid.Row="14" Grid.Column="1" Name="BtnStart" IsEnabled="false" HorizontalAlignment="Left" VerticalAlignment="Center"
+            Width="250" Height="30" Margin="10">Start</Button>
     </Grid>
 </Window>

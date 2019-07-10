@@ -15,5 +15,7 @@ namespace ImageLabelingAvalonia.Models
         public static string[] classes;
         /// Resuming a previous labeling operation or not
         public static bool isResuming;
+        /// List of accepted image extensions
+        public  static string[] extensions = new string[] { ".jpg", ".jpeg", ".bmp"};
     }
 }

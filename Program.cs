@@ -11,102 +11,107 @@ namespace ImageLabelingAvalonia
         // Initialization code. Don't use any Avalonia, third-party APIs or any
         // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
         // yet and stuff might break.
-        public static void Main(DirectoryInfo input, DirectoryInfo output=null, string name = null, string[] classes = null, bool resume = false)
+        public static void Main(string[] args)
         {
-            // check that input exists
-            if(!input.Exists)
-            {
-                System.Console.WriteLine("The input directory does not exists. Please enter an existing directory.");
-                return;
-            }
+            BuildAvaloniaApp().Start(AppMain, args);    
+        } 
 
-            // check output and set it if it is not
-            if(output != null  && !output.Exists)
-            {
-                System.Console.WriteLine("The out directory does not exists. Please enter an existing directory.");
-                return;
-            }
-            if(output == null)
-                output = input.Parent;
+        // public static void Main(DirectoryInfo input, DirectoryInfo output=null, string name = null, string[] classes = null, bool resume = false)
+        // {
+        //     // check that input exists
+        //     if(!input.Exists)
+        //     {
+        //         System.Console.WriteLine("The input directory does not exists. Please enter an existing directory.");
+        //         return;
+        //     }
 
-            // check name and set it if it is not
-            if(name == null)
-                name = input.Name + "-labels";
+        //     // check output and set it if it is not
+        //     if(output != null  && !output.Exists)
+        //     {
+        //         System.Console.WriteLine("The out directory does not exists. Please enter an existing directory.");
+        //         return;
+        //     }
+        //     if(output == null)
+        //         output = input.Parent;
+
+        //     // check name and set it if it is not
+        //     if(name == null)
+        //         name = input.Name + "-labels";
                 
-            // classes depend on whether we are resuming or not
-            if(resume)
-            {
-                // if resuming, the CSV must exist
-                if(!File.Exists(Path.Combine(output.FullName, name, ImageLabeling.csv_name)))
-                {
-                    System.Console.WriteLine("The 'results.csv' file could not be found in the specified path.");
-                    System.Console.WriteLine("Please make sure that the 'results.csv' file exists and is in the right folder.");
-                    return;
-                }
+        //     // classes depend on whether we are resuming or not
+        //     if(resume)
+        //     {
+        //         // if resuming, the CSV must exist
+        //         if(!File.Exists(Path.Combine(output.FullName, name, ImageLabeling.csv_name)))
+        //         {
+        //             System.Console.WriteLine("The 'results.csv' file could not be found in the specified path.");
+        //             System.Console.WriteLine("Please make sure that the 'results.csv' file exists and is in the right folder.");
+        //             return;
+        //         }
 
-                // get classes from the CSV
-                using(var reader = new StreamReader(Path.Combine(output.FullName, name, ImageLabeling.csv_name)))
-                {
-                    string line = reader.ReadLine();
+        //         // get classes from the CSV
+        //         using(var reader = new StreamReader(Path.Combine(output.FullName, name, ImageLabeling.csv_name)))
+        //         {
+        //             string line = reader.ReadLine();
 
-                    if(line == null)
-                    {
-                        System.Console.WriteLine("The csv file seems to be corrupted. Aborting...");
-                        return;
-                    }
+        //             if(line == null)
+        //             {
+        //                 System.Console.WriteLine("The csv file seems to be corrupted. Aborting...");
+        //                 return;
+        //             }
 
-                    var splits = line.Split(",");
+        //             var splits = line.Split(",");
 
-                    classes = new string[splits.Length - 1];
-                    for (int i = 1; i < splits.Length; i++)
-                    {
-                        classes[i-1] = splits[i];
-                    }
-                }
-            }
-            else
-            {
-                // check if there is already an output csv file, there musn't
-                if(File.Exists(Path.Combine(output.FullName, name, ImageLabeling.csv_name)))
-                {
-                    System.Console.WriteLine("There seems to be already a CSV file in this folder.");
-                    System.Console.WriteLine("If you are resuming a previous labeling operation, please use the option --resume.");
-                    System.Console.WriteLine("Else, please a different folder for your output.");
-                    return;
-                }
+        //             classes = new string[splits.Length - 1];
+        //             for (int i = 1; i < splits.Length; i++)
+        //             {
+        //                 classes[i-1] = splits[i];
+        //             }
+        //         }
+        //     }
+        //     else
+        //     {
+        //         // check if there is already an output csv file, there musn't
+        //         if(File.Exists(Path.Combine(output.FullName, name, ImageLabeling.csv_name)))
+        //         {
+        //             System.Console.WriteLine("There seems to be already a CSV file in this folder.");
+        //             System.Console.WriteLine("If you are resuming a previous labeling operation, please use the option --resume.");
+        //             System.Console.WriteLine("Else, please a different folder for your output.");
+        //             return;
+        //         }
 
-                if(classes != null && (classes.Length < 2 || classes.Length > 9))
-                {
-                    System.Console.WriteLine("The number of classes must be between 2 and 9.");
-                    return;
-                }
-                if(classes == null)
-                    classes = new[] {"OK", "UNSURE", "NOTOK"};
+        //         if(classes != null && (classes.Length < 2 || classes.Length > 9))
+        //         {
+        //             System.Console.WriteLine("The number of classes must be between 2 and 9.");
+        //             return;
+        //         }
+        //         if(classes == null)
+        //             classes = new[] {"OK", "UNSURE", "NOTOK"};
 
-            }
+        //     }
 
-            // update the global parameters
-            ImageLabeling.input_path = input.FullName;
-            ImageLabeling.output_path = output.FullName;
-            ImageLabeling.labeling_name = name;
-            ImageLabeling.classes = classes;
-            ImageLabeling.isResuming = resume;
+        //     // update the global parameters
+        //     ImageLabeling.input_path = input.FullName;
+        //     ImageLabeling.output_path = output.FullName;
+        //     ImageLabeling.labeling_name = name;
+        //     ImageLabeling.classes = classes;
+        //     ImageLabeling.isResuming = resume;
 
-            // System.Console.WriteLine($"{ImageLabeling.input_path}");
-            // System.Console.WriteLine($"{ImageLabeling.output_path}");
-            // System.Console.WriteLine($"{ImageLabeling.labeling_name}");
-            // System.Console.WriteLine($"{ImageLabeling.classes[0]}");
-            // System.Console.WriteLine($"{ImageLabeling.isResuming}");
+        //     // System.Console.WriteLine($"{ImageLabeling.input_path}");
+        //     // System.Console.WriteLine($"{ImageLabeling.output_path}");
+        //     // System.Console.WriteLine($"{ImageLabeling.labeling_name}");
+        //     // System.Console.WriteLine($"{ImageLabeling.classes[0]}");
+        //     // System.Console.WriteLine($"{ImageLabeling.isResuming}");
 
-            //uncomment below and comment up stuff to use debug ...
-            // ImageLabeling.input_path = @"/Users/ben.ghassen/Documents/Workstuff/Pole/inputfiles";
-            // ImageLabeling.output_path = @"/Users/ben.ghassen/Documents/Workstuff/Pole/";
-            // ImageLabeling.labeling_name = "inputfiles-labels";
-            // ImageLabeling.classes = new[] {"abc", "def", "ghi", "jkl"};
-            // ImageLabeling.isResuming = resume;
+        //     //uncomment below and comment up stuff to use debug ...
+        //     // ImageLabeling.input_path = @"/Users/ben.ghassen/Documents/Workstuff/Pole/inputfiles";
+        //     // ImageLabeling.output_path = @"/Users/ben.ghassen/Documents/Workstuff/Pole/";
+        //     // ImageLabeling.labeling_name = "inputfiles-labels";
+        //     // ImageLabeling.classes = new[] {"abc", "def", "ghi", "jkl"};
+        //     // ImageLabeling.isResuming = resume;
 
-            BuildAvaloniaApp().Start(AppMain, null);
-        }  
+        //     BuildAvaloniaApp().Start(AppMain, null);
+        // }  
 
         // Avalonia configuration, don't remove; also used by visual designer.
         public static AppBuilder BuildAvaloniaApp()
@@ -122,8 +127,7 @@ namespace ImageLabelingAvalonia
             // set window size and location in constructor
             var window = new IntroWindow()
             { 
-             WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.Manual,
-             WindowState = Avalonia.Controls.WindowState.Maximized,
+             WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterScreen,
              SizeToContent = Avalonia.Controls.SizeToContent.WidthAndHeight
             };
 

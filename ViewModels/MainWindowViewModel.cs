@@ -23,7 +23,6 @@ namespace ImageLabelingAvalonia.ViewModels
         public List<ImageLabel> Images { get; private set; } = new List<ImageLabel>();
         /// this is the list of the tagged images objects
         public List<ImageLabel> TaggedImages { get; private set; } = new List<ImageLabel>();
-        private string[] extensions = new string[] { ".jpg", ".jpeg", ".bmp"};
         /// this is the current index of the carousel
         public int CurrentIndex { get; set; }
 
@@ -63,7 +62,7 @@ namespace ImageLabelingAvalonia.ViewModels
 
             // get all the image files and fill the different lists
             foreach (var file in Directory.EnumerateFiles(ImageLabeling.input_path)
-                    .Where( x=> extensions.Any(ext => ext == Path.GetExtension(x).ToLower())).OrderBy(x => x))
+                    .Where( x=> ImageLabeling.extensions.Any(ext => ext == Path.GetExtension(x).ToLower())).OrderBy(x => x))
             {
                 Files.Add(file);
                 FileNames.Add(Path.GetFileName(file));
@@ -80,13 +79,6 @@ namespace ImageLabelingAvalonia.ViewModels
                                                 Tag = String.Empty});
             }
 
-            // sanity check if no images
-            if(Files.Count == 0)
-            {
-                System.Console.WriteLine("There are no image files of the proper extensions in the input filder you selected.");
-                System.Console.WriteLine("Please try again with a valid input folder.");
-                App.Current.Exit();
-            }
 
             // init the currentX properties and per tag count
             CurrentIndex = 0;
