@@ -14,7 +14,7 @@ namespace ImageLabelingAvalonia.Views
     public class IntroWindow : Window
     {
         private Button _inputButton, _outputButton, _startButton;
-        private TextBox _inputTextBox, _outputTextBox, _nameTextBox, _class1, _class2, _class3, _class4, _class5, _class6, _class7, _class8, _class9;
+        private TextBox _inputTextBox, _outputTextBox, _class1, _class2, _class3, _class4, _class5, _class6, _class7, _class8, _class9;
         private TextBlock _errorTextBlock;
         private CheckBox _doResume;
         private List<TextBox> classesTextBoxes = new List<TextBox>();
@@ -31,7 +31,6 @@ namespace ImageLabelingAvalonia.Views
             _inputTextBox.Text = "";
             _outputTextBox.Text = "";
             _errorTextBlock.Text = string.Empty;
-            _nameTextBox.PropertyChanged += (s,e) => {_errorTextBlock.Text = string.Empty;};
             classesTextBoxes.Add(_class1);
             classesTextBoxes.Add(_class2);
             classesTextBoxes.Add(_class3);
@@ -51,7 +50,6 @@ namespace ImageLabelingAvalonia.Views
             _outputButton = this.FindControl<Button>("BtnOutput");
             _inputTextBox = this.FindControl<TextBox>("TxtBoxInput");
             _outputTextBox = this.FindControl<TextBox>("TxtBoxOutput");
-            _nameTextBox = this.FindControl<TextBox>("TxtBoxName");
             _errorTextBlock = this.FindControl<TextBlock>("TxtBlockError");
             _startButton = this.FindControl<Button>("BtnStart");
             _doResume = this.FindControl<CheckBox>("ChkBoxResume");
@@ -104,15 +102,6 @@ namespace ImageLabelingAvalonia.Views
             }
 
 
-            // check labeling name
-            if(_nameTextBox.Text.Length < 1)
-            {
-                _errorTextBlock.Text = "You must choose a name for the result folder.";
-                return;
-            }
-            ImageLabeling.labeling_name = _nameTextBox.Text;
-
-
             // check classes
             string[] classes;
             if(!(bool)_doResume.IsChecked)
@@ -140,7 +129,7 @@ namespace ImageLabelingAvalonia.Views
                     return;
                 }
 
-                using(var reader = new StreamReader(Path.Combine(_outputTextBox.Text, _nameTextBox.Text, ImageLabeling.csv_name)))
+                using(var reader = new StreamReader(Path.Combine(_outputTextBox.Text, ImageLabeling.csv_name)))
                 {
                     string header = reader.ReadLine();
 
@@ -163,7 +152,7 @@ namespace ImageLabelingAvalonia.Views
             
             
             // check if you are not resuming but output+name folder already has a csv
-            if(!ImageLabeling.isResuming && File.Exists(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name, ImageLabeling.csv_name)))
+            if(!ImageLabeling.isResuming && File.Exists(Path.Combine(ImageLabeling.output_path, ImageLabeling.csv_name)))
             {
                 _errorTextBlock.Text = "There seems to be already a CSV file in this folder, please use a different folder or name for your output.";
                 return;
@@ -195,7 +184,7 @@ namespace ImageLabelingAvalonia.Views
 
         private bool CheckCSVExistsIfResuming()
         {
-            return File.Exists(Path.Combine(_outputTextBox.Text, _nameTextBox.Text, ImageLabeling.csv_name));
+            return File.Exists(Path.Combine(_outputTextBox.Text, ImageLabeling.csv_name));
         }
 
 

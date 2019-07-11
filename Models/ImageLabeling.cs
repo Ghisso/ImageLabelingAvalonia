@@ -7,8 +7,6 @@ namespace ImageLabelingAvalonia.Models
         public static string input_path;
         /// Folder path of where to save the results of the labeling
         public static string output_path;
-        /// Name of the folder of where to save the results of the labeling
-        public static string labeling_name;
         /// Name of the resulting CSV file
         public static string csv_name = "results.csv";
         /// List of labels

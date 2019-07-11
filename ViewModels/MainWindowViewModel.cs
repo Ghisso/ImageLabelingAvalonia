@@ -108,7 +108,7 @@ namespace ImageLabelingAvalonia.ViewModels
             {
                 string line;
                 // we already checked that the file exists and contains a valid header in startButton handler
-                using(System.IO.StreamReader file = new System.IO.StreamReader(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name, ImageLabeling.csv_name))) 
+                using(System.IO.StreamReader file = new System.IO.StreamReader(Path.Combine(ImageLabeling.output_path, ImageLabeling.csv_name))) 
                 {
                     // loop through the lines to read the records if there are
                     while((line = file.ReadLine()) != null)  
@@ -151,7 +151,7 @@ namespace ImageLabelingAvalonia.ViewModels
 
 
                 // delete all the copied images
-                foreach (var directory in Directory.EnumerateDirectories(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name)))
+                foreach (var directory in Directory.EnumerateDirectories(ImageLabeling.output_path))
                 {
                     foreach (var file in Directory.EnumerateFiles(directory))
                     {
@@ -162,10 +162,10 @@ namespace ImageLabelingAvalonia.ViewModels
             // create the folders
             else
             {
-                Directory.CreateDirectory(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name));
+                Directory.CreateDirectory(ImageLabeling.output_path);
                 foreach (var clas in ImageLabeling.classes)
                 {
-                    Directory.CreateDirectory(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name,clas));
+                    Directory.CreateDirectory(Path.Combine(ImageLabeling.output_path, clas));
                 }
             }
 
@@ -230,7 +230,7 @@ namespace ImageLabelingAvalonia.ViewModels
             lock(lockObject)
             {
                 // write to CSV and copy images
-                using(var writer = new StreamWriter(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name, ImageLabeling.csv_name)))
+                using(var writer = new StreamWriter(Path.Combine(ImageLabeling.output_path, ImageLabeling.csv_name)))
                 {
                     //hacking this to be able to write the header even if no image is tagged
                     string[] header = new string[ImageLabeling.classes.Length + 1];
@@ -251,7 +251,7 @@ namespace ImageLabelingAvalonia.ViewModels
                             if(image.Tag == ImageLabeling.classes[i])
                             {
                                 row[i + 1] = "1";
-                                File.Copy(image.Filepath, Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name,ImageLabeling.classes[i], image.Filename));
+                                File.Copy(image.Filepath, Path.Combine(ImageLabeling.output_path, ImageLabeling.classes[i], image.Filename));
                             }
                                 
                             else
@@ -291,7 +291,7 @@ namespace ImageLabelingAvalonia.ViewModels
 
                 lock(lockObject)
                 {
-                    using(var writer = new StreamWriter(Path.Combine(ImageLabeling.output_path, ImageLabeling.labeling_name, ImageLabeling.csv_name)))
+                    using(var writer = new StreamWriter(Path.Combine(ImageLabeling.output_path, ImageLabeling.csv_name)))
                     {
                         //hacking this to be able to write the header even if no image is tagged
                         string[] header = new string[ImageLabeling.classes.Length + 1];
